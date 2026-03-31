@@ -1,0 +1,31 @@
+quadro_de_medalhas
+                                                                                                                                                                                                                                      CREATE OR REPLACE PROCEDURE atividadesql2.quadro_de_medalhas()
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    -- Relatório de Medalhas por Clube
+    -- Considera a colocação (1º, 2º, 3º) para definir Ouro, Prata e Bronze
+    DROP TABLE IF EXISTS RelatorioMedalhas; -- Tabela temporária para visualização do resultado
+    CREATE TEMP TABLE RelatorioMedalhas AS
+    SELECT 
+        c.nome_clube,
+        c.sigla AS clube_sigla,
+        COUNT(r.id_resultado) FILTER (WHERE r.colocacao = 1) AS ouro,
+        COUNT(r.id_resultado) FILTER (WHERE r.colocacao = 2) AS prata,
+        COUNT(r.id_resultado) FILTER (WHERE r.colocacao = 3) AS bronze,
+        SUM(CASE 
+            WHEN r.colocacao = 1 THEN 9 -- Exemplo de pontuação por eficiência
+            WHEN r.colocacao = 2 THEN 7
+            WHEN r.colocacao = 3 THEN 6
+            ELSE 0 
+        END) AS pontuacao_total
+    FROM atividadesql2.CLUBE c
+    JOIN atividadesql2.ATLETA a ON c.id_clube = a.id_clube
+    JOIN atividadesql2.RESULTADO r ON a.id_atleta = r.id_atleta
+    GROUP BY c.id_clube, c.nome_clube, c.sigla
+    ORDER BY ouro DESC, prata DESC, bronze DESC, pontuacao_total DESC;
+
+    -- Nota: Em um ambiente real, poderíamos dar um RAISE NOTICE ou retornar um Cursor.
+    RAISE NOTICE 'Quadro de Medalhas gerado com sucesso na tabela temporária RelatorioMedalhas.';
+END;
+$$;
