@@ -1,16 +1,30 @@
 # BD-comp-natacao
-diagrama da estrutura de um sistema de gestão de competições de natação
-ESTADO: Armazena as unidades federativas (sigla e nome) para localização dos clubes.
-CLUBE: Entidade que representa as agremiações esportivas filiadas.
-ATLETA: Cadastro principal dos nadadores, contendo dados pessoais e registros federativos (CBDA).
-CATEGORIA: Define as divisões por idade (ex: Juvenil) com faixas etárias mínimas e máximas.
-SEXO: Tabela auxiliar para padronização de gênero (Masculino/Feminino).
-EVENTO: O torneio ou campeonato em si, com informações de local e tipo de piscina (curta ou longa).
-PROVA: A unidade técnica da competição (ex: 50m Borboleta), vinculada a um estilo e categoria.
-ESTILO: Define o tipo de nado (Crawl, Costas, Peito, Borboleta ou Medley).
-SERIE: Divisão das provas em baterias para organizar as largadas dos atletas.
-RESULTADO_PARCIAL: Registro de tempos intermediários e passagens durante a execução da prova.
-RESULTADO: O registro final oficial, consolidando o tempo total e a colocação do atleta.
+Ao desenvolver estas procedures, identifiquei e corrigi os seguintes pontos críticos:
+
+  1. Correção da "Alucinação" de Categorias (Lógica de Negócio)
+Erro da IA: Inicialmente, o modelo de IA sugeriu faixas etárias genéricas (ex: Mirim começando aos 9 anos).
+
+Correção Aplicada: Conforme o regulamento da FASE Aquática para o Troféu Alexandre Pussieldi, a lógica foi ajustada para: Pré-Mirim (Até 9 anos) e Mirim (10-11 anos).
+
+Justificativa: Diferente de categorias escolares, a natação federada utiliza o ano de nascimento como base rígida. O cálculo foi implementado usando EXTRACT(YEAR FROM...) para garantir precisão na data de corte do evento.
+
+2. Alinhamento com a Entidade de Agregação (RESULTADO)
+Decisão Técnica: As procedures quadro_de_medalhas e atletas_e_clubes consomem dados diretamente da tabela RESULTADO.
+
+Justificativa: Seguindo a estratégia de design do projeto, a tabela RESULTADO centraliza o desfecho final (colocação e tempo). Isso evita que as procedures precisem realizar cálculos complexos na tabela PARCIAL (granulada) apenas para gerar um ranking simples, otimizando a performance do banco.
+
+3. Uso das Tabelas de Domínio (Lookup Tables)
+Implementação: As procedures realizam JOINS com as tabelas CLUBE e ATLETA, acessando as descrições normalizadas.
+
+Vantagem: Graças à normalização em 3ª Forma Normal, o relatório de clubes não corre o risco de duplicar agremiações por erros de digitação (ex: "Flamengo" vs "C.R. Flamengo"), pois a procedure utiliza o id_clube como âncora de integridade.
+
+4. Integridade Referencial e Performance
+Tipagem: Foi respeitado o uso de INT para chaves primárias e estrangeiras nos Joins das procedures, garantindo rapidez na indexação de milhares de resultados.
+
+Segurança de Schema: Toda a implementação foi encapsulada no schema atividadesql2, garantindo que as funções estatísticas não entrem em conflito com outras tabelas do banco de dados global.
+
+5. Tratamento de Dados (Casos de Borda)
+Refinamento: Adicionamos o uso de FILTER e CASE WHEN para tratar atletas desclassificados ou que não compareceram (DNS). No quadro de medalhas, apenas colocações de 1 a 3 geram contagem, ignorando registros nulos ou zero, o que é uma falha comum em códigos gerados puramente por IA sem contexto esportivo.
 
 ```mermaid
 ---
