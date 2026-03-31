@@ -1,24 +1,15 @@
 # BD-comp-natacao
+diagrama da estrutura de um sistema de gestão de competições de natação
 ESTADO: Armazena as unidades federativas (sigla e nome) para localização dos clubes.
-
 CLUBE: Entidade que representa as agremiações esportivas filiadas.
-
 ATLETA: Cadastro principal dos nadadores, contendo dados pessoais e registros federativos (CBDA).
-
-CATEGORIA: Define as divisões por idade (ex: Petiz, Infantil, Juvenil) com faixas etárias mínimas e máximas.
-
+CATEGORIA: Define as divisões por idade (ex: Juvenil) com faixas etárias mínimas e máximas.
 SEXO: Tabela auxiliar para padronização de gênero (Masculino/Feminino).
-
 EVENTO: O torneio ou campeonato em si, com informações de local e tipo de piscina (curta ou longa).
-
 PROVA: A unidade técnica da competição (ex: 50m Borboleta), vinculada a um estilo e categoria.
-
 ESTILO: Define o tipo de nado (Crawl, Costas, Peito, Borboleta ou Medley).
-
 SERIE: Divisão das provas em baterias para organizar as largadas dos atletas.
-
 RESULTADO_PARCIAL: Registro de tempos intermediários e passagens durante a execução da prova.
-
 RESULTADO: O registro final oficial, consolidando o tempo total e a colocação do atleta.
 
 ```mermaid
